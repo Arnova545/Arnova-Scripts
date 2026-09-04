@@ -5,15 +5,12 @@ local Function = {}
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-
 function run(Player)
 	local Camera = workspace.CurrentCamera
 
 	local IS = game:GetService("InsertService")
 
 	local Spring
-
-
 
 	if RunService:IsStudio() then
 		Spring = require(script.Spring)
@@ -40,12 +37,10 @@ function run(Player)
 		Spring = requireStuff("https://raw.githubusercontent.com/Arnova545/Roclothes/refs/heads/main/Spring","Spring")
 	end
 
-
 	local SelectPlayer = Player.Name
 
 	local PositionPhysicsMultiply = 1
 	local RotationPhysicsMultiply = 4
-
 
 	function Function.PartListDefault()	
 		return {
@@ -2140,7 +2135,6 @@ function run(Player)
 						}
 					},},
 
-		
 			},
 			RoClothes1 =  {
 				Breasts = {
@@ -2306,7 +2300,6 @@ function run(Player)
 							}
 						},
 					},
-
 
 					["Right Breast"] = {
 						["Instance"] = "Mesh",
@@ -2699,14 +2692,10 @@ function run(Player)
 				},
 				NoUV = true,
 
-
-
 			}    ,
 
 		}
 	end
-
-
 
 	function Function.PlayerDataDefault()
 		return {
@@ -2830,7 +2819,6 @@ function run(Player)
 		["HumanoidRootPart"] = Vector3.new(2, 2, 1),
 	}
 
-
 	function Function.MultiplyCalculate(Base, Default)
 		local X = Base.X / Default.X
 		local Y = Base.Y / Default.Y
@@ -2899,7 +2887,6 @@ function run(Player)
 		return color:Lerp(Color3.new(0,0,0), amount)
 	end
 
-
 	function Function.AreolaDecalCreate(ObjectInstance, Character, Extra, Data)
 		local Decal = Instance.new("Decal", ObjectInstance)
 		Decal.Color3 = Color3.fromRGB(110, 110, 111)
@@ -2907,8 +2894,6 @@ function run(Player)
 		Decal.Face = "Right"
 		Decal.Name = "Areola Decal"
 		PlayerData[Data].CurrentPartList.AreolaDecal[Decal] = ObjectInstance
-
-
 
 		Decal.Color3 = Function.DarkenColor(Character.Torso.Color,0.32)
 	end
@@ -3104,7 +3089,6 @@ function run(Player)
 		end
 	end
 
-
 	function Function.ButtPhysics(ObjectInstance, Character, Extra, Data)
 		if PlayerData[Data].BodyPartPhysics then
 			local Torso = Character:FindFirstChild("Torso")
@@ -3148,7 +3132,6 @@ function run(Player)
 		end
 	end
 
-
 	function Function.CreateR6(CF)
 		local R6 = Instance.new("Model")
 		local R6Humanoid = Instance.new("Humanoid", R6)
@@ -3183,7 +3166,6 @@ function run(Player)
 			Joint.Part0 = Property["Part0"]
 			Joint.Part1 = Property["Part1"]
 		end
-
 
 		return R6
 	end
@@ -3316,7 +3298,6 @@ function run(Player)
 					end
 				end
 
-
 				ObjectInstance.CanCollide = false
 				ObjectInstance.CanQuery = false
 				ObjectInstance.CanTouch = false
@@ -3325,7 +3306,6 @@ function run(Player)
 				ObjectInstance.Name = NAME
 				ObjectInstance.Transparency = TRANSPARENCY
 				ObjectInstance.Material = MATERIAL
-
 
 				local WeldInstance = Instance.new("Motor6D", ObjectInstance)
 				WeldInstance.Name = NAME.." Weld"
@@ -3351,7 +3331,6 @@ function run(Player)
 				else
 					ObjectInstance.Color = Character.Torso.Color
 				end
-
 
 				if FUNCTION ~= "" then
 					if typeof(FUNCTION) == "string" then
@@ -3526,7 +3505,6 @@ function run(Player)
 				local DataConfig = PlayerData[Data]
 
 				local Humanoid = Character:FindFirstChildOfClass("Humanoid")
-				
 
 				local Extra = {
 					Shirt = Character:FindFirstChildOfClass("Shirt"),
@@ -3594,7 +3572,6 @@ function run(Player)
 					local M_LA = createContainer("Left Arm")
 					M_LL.Size = Vector3.new(1, 2, 1)
 
-
 					table.insert(DataConfig.CurrentPartList.Organ,Morph)
 					for _, i in pairs(Morph:GetChildren()) do
 						i.CanCollide = false
@@ -3605,8 +3582,7 @@ function run(Player)
 						i.Color = Character[i.Name].Color
 						Character[i.Name].Transparency = 0
 					end
-					
-		
+
 					
 					for _, object in pairs(SelectedMorph.Limbs) do
 						Function.Weld(object, Character,Extra, Data)
@@ -3616,7 +3592,6 @@ function run(Player)
 							end
 						end)
 					end
-
 
 				end
 
@@ -3635,7 +3610,6 @@ function run(Player)
 						local Weld = createWeld(VModel)
 						Weld.Part0 = Morph.Torso
 						Weld.Part1 = VModel
-
 
 						for _, OBJECT in pairs(object) do
 							Function.Weld(OBJECT, Character,Extra, Data)
@@ -3746,8 +3720,6 @@ function run(Player)
 								return
 							end
 
-
-
 							local PositionList = {
 								X = 0,
 								Y = 0,
@@ -3790,7 +3762,6 @@ function run(Player)
 								end)
 							end
 
-
 							Weld.C0 = CF *
 								Function.CFrameMultiply(
 									CFrame.new(
@@ -3806,7 +3777,6 @@ function run(Player)
 									-RotationList.Z
 								)
 
-
 						end
 
 						PlayerData[PlayerName].CurrentPartList.BodyPartPhysics[Part].OriginCFrame = CurrentCFrame 
@@ -3816,9 +3786,6 @@ function run(Player)
 		end
 
 	end)
-
-
-
 
 	local currentMorph = 1
 	game:GetService("UserInputService").InputBegan:Connect(function(input,gpe)
@@ -3895,7 +3862,6 @@ function run(Player)
 					highlight:Destroy() 
 				end)
 			end
-
 
 		end
 	end)
