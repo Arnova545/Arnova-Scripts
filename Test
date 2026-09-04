@@ -1,6 +1,8 @@
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-local character = script.Parent
+
+-- Fix: Wir holen den Charakter direkt vom Spieler, nicht über 'script'
+local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 local hrp = character:WaitForChild("HumanoidRootPart")
 
@@ -31,11 +33,11 @@ button.MouseButton1Click:Connect(function()
 		button.Text = "Float: ON"
 		button.BackgroundColor3 = Color3.fromRGB(80, 255, 80)
 		
-		-- Float aktivieren (BodyVelocity blockiert die Y-Achse, also die Schwerkraft)
+		-- Float aktivieren
 		if not hrp:FindFirstChild("FloatForce") then
 			floatForce = Instance.new("BodyVelocity")
 			floatForce.Name = "FloatForce"
-			floatForce.MaxForce = Vector3.new(0, math.huge, 0) -- Wirkt nur nach oben/unten
+			floatForce.MaxForce = Vector3.new(0, math.huge, 0) -- Wirkt nur auf die Y-Achse
 			floatForce.Velocity = Vector3.new(0, 0, 0) -- Hält dich auf der aktuellen Höhe
 			floatForce.Parent = hrp
 		end
@@ -52,7 +54,9 @@ button.MouseButton1Click:Connect(function()
 	end
 end)
 
--- 3. UI sauber entfernen, falls der Charakter stirbt (verhindert doppelte Buttons beim Respawn)
+-- 3. UI aufräumen, wenn der Charakter stirbt
 humanoid.Died:Connect(function()
-	gui:Destroy()
+	if gui then
+		gui:Destroy()
+	end
 end)
