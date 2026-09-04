@@ -1,1 +1,58 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = script.Parent
+local humanoid = character:WaitForChild("Humanoid")
+local hrp = character:WaitForChild("HumanoidRootPart")
 
+-- 1. UI automatisch erstellen
+local gui = Instance.new("ScreenGui")
+gui.Name = "FloatGUI"
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0, 200, 0, 50)
+button.Position = UDim2.new(0.5, -100, 0.8, 0) -- Unten in der Mitte des Bildschirms
+button.BackgroundColor3 = Color3.fromRGB(255, 80, 80) -- Rot
+button.Text = "Float: OFF"
+button.TextScaled = true
+button.Font = Enum.Font.FredokaOne
+button.TextColor3 = Color3.fromRGB(255, 255, 255)
+button.Parent = gui
+
+-- 2. Float-Logik
+local isFloating = false
+local floatForce = nil
+
+button.MouseButton1Click:Connect(function()
+	isFloating = not isFloating
+	
+	if isFloating then
+		-- Button auf AN stellen (Grün)
+		button.Text = "Float: ON"
+		button.BackgroundColor3 = Color3.fromRGB(80, 255, 80)
+		
+		-- Float aktivieren (BodyVelocity blockiert die Y-Achse, also die Schwerkraft)
+		if not hrp:FindFirstChild("FloatForce") then
+			floatForce = Instance.new("BodyVelocity")
+			floatForce.Name = "FloatForce"
+			floatForce.MaxForce = Vector3.new(0, math.huge, 0) -- Wirkt nur nach oben/unten
+			floatForce.Velocity = Vector3.new(0, 0, 0) -- Hält dich auf der aktuellen Höhe
+			floatForce.Parent = hrp
+		end
+	else
+		-- Button auf AUS stellen (Rot)
+		button.Text = "Float: OFF"
+		button.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+		
+		-- Float entfernen
+		if floatForce then
+			floatForce:Destroy()
+			floatForce = nil
+		end
+	end
+end)
+
+-- 3. UI sauber entfernen, falls der Charakter stirbt (verhindert doppelte Buttons beim Respawn)
+humanoid.Died:Connect(function()
+	gui:Destroy()
+end)
