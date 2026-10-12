@@ -373,7 +373,7 @@ local function BuildHomeDashboard(parentFrame)
 			pcall(function()
 				queueFunc([[
 					repeat task.wait() until game:IsLoaded()
-					loadstring(game:HttpGet("https://raw.githubusercontent.com/..."))()
+					loadstring(game:HttpGet("https://raw.githubusercontent.com/Arnova545/Arnova-Scripts/refs/heads/main/Test"))()
 				]])
 			end)
 		end
