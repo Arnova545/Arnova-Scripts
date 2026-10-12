@@ -1,13 +1,3 @@
---[[
-    NOVA HUB - Ultimate Copilot Panel
-    - Echtes, schrittweises Laden
-    - VOLLSTÄNDIG FUNKTIONALES & MODERNISIERTES HOME-DASHBOARD
-    - Rejoin Server ohne Emoji & Auto-Reload nach Rejoin (Fehlerfrei)
-    - Integrierter Script-Suchtab (ScriptBlox / RScripts Integration)
-    - Neue Gradients, Hover-Effekte & sauberes Spacing
-    Standard-Taste zum Öffnen/Schließen: J
-]]
-
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
@@ -21,12 +11,16 @@ local TeleportService = game:GetService("TeleportService")
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 
-local existingGui = player:WaitForChild("PlayerGui"):FindFirstChild("NovaHubGUI")
-if existingGui then existingGui:Destroy() end
+local function cleanupOldGui()
+	local coreGuiExisting = CoreGui:FindFirstChild("NovaHubGUI")
+	if coreGuiExisting then coreGuiExisting:Destroy() end
+	
+	local playerGui = player:WaitForChild("PlayerGui")
+	local playerGuiExisting = playerGui:FindFirstChild("NovaHubGUI")
+	if playerGuiExisting then playerGuiExisting:Destroy() end
+end
+cleanupOldGui()
 
---------------------------------------------------------------------------
--- KONFIGURATION & STYLING
---------------------------------------------------------------------------
 local TOGGLE_KEY = Enum.KeyCode.J
 local THEME = {
 	BackgroundColor = Color3.fromRGB(24, 27, 34),
@@ -49,7 +43,6 @@ local UI_OPEN = false
 local isAnimating = false 
 local isLoaded = false 
 
--- Sound, der abgespielt wird, sobald das UI vollständig geladen ist
 local LoadCompleteSound = Instance.new("Sound")
 LoadCompleteSound.Name = "NovaHubLoadComplete"
 LoadCompleteSound.SoundId = "rbxassetid://97634940045228"
@@ -70,9 +63,6 @@ local TWEEN_HOVER = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirecti
 local TWEEN_SWITCH = TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
 local TWEEN_SLIDE = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
 
---------------------------------------------------------------------------
--- SCREEN GUI SETUP
---------------------------------------------------------------------------
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "NovaHubGUI"
 ScreenGui.ResetOnSpawn = false
@@ -81,9 +71,6 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 local success = pcall(function() ScreenGui.Parent = CoreGui end)
 if not success then ScreenGui.Parent = player:WaitForChild("PlayerGui") end
 
---------------------------------------------------------------------------
--- LADE-UI & HILFSFUNKTIONEN
---------------------------------------------------------------------------
 local LoadingFrame = Instance.new("Frame")
 LoadingFrame.Size = UDim2.new(0, 260, 0, 100)
 LoadingFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -148,12 +135,11 @@ local function CreateLabel(parent, text, pos, size, font, color, textSize)
 	return label
 end
 
--- Hilfsfunktion für schöne, einheitliche Karten mit Farbverlauf
 local function CreateBeautifulCard(parent, size, pos)
 	local Card = Instance.new("Frame")
 	Card.Size = size
 	Card.Position = pos
-	Card.BackgroundColor3 = Color3.new(1, 1, 1) -- Weiß für Gradient
+	Card.BackgroundColor3 = Color3.new(1, 1, 1)
 	Card.BorderSizePixel = 0
 	Card.Parent = parent
 	
@@ -171,14 +157,10 @@ local function CreateBeautifulCard(parent, size, pos)
 	return Card
 end
 
---------------------------------------------------------------------------
--- HOME DASHBOARD BAUEN
---------------------------------------------------------------------------
 local function BuildHomeDashboard(parentFrame)
 	parentFrame.BackgroundTransparency = 1
 	local PADDING = 15
 	
-	-- 1. WELCOME CARD
 	local WelcomeCard = Instance.new("Frame")
 	WelcomeCard.Size = UDim2.new(0.35, 0, 0.4, 0)
 	WelcomeCard.Position = UDim2.new(0, PADDING, 0, PADDING)
@@ -220,7 +202,6 @@ local function BuildHomeDashboard(parentFrame)
 	local BadgeText = CreateLabel(Badge, "Welcome Back", UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 1, 0), THEME.Font_Bold, Color3.fromRGB(30, 50, 130), 12)
 	BadgeText.TextXAlignment = Enum.TextXAlignment.Center
 
-	-- 2. SERVER INFO CARD
 	local TopRightCard = CreateBeautifulCard(parentFrame, UDim2.new(0.65, -(PADDING * 3), 0.4, 0), UDim2.new(0.35, PADDING * 2, 0, PADDING))
 	
 	CreateLabel(TopRightCard, "📋 Server Information", UDim2.new(0, 20, 0, 15), UDim2.new(1, 0, 0, 20), THEME.Font_Bold, THEME.TextColor, 16)
@@ -246,7 +227,6 @@ local function BuildHomeDashboard(parentFrame)
 	AddInfoRow("Server Job ID:", string.sub(game.JobId, 1, 15) .. "...", false)
 	AddInfoRow("Max Players:", tostring(Players.MaxPlayers), true)
 
-	-- 3. LIVE STATS GRID
 	local StatsContainer = Instance.new("Frame")
 	StatsContainer.Size = UDim2.new(0.35, 0, 0.6, -(PADDING * 3))
 	StatsContainer.Position = UDim2.new(0, PADDING, 0.4, PADDING * 2)
@@ -314,7 +294,6 @@ local function BuildHomeDashboard(parentFrame)
 		end
 	end)
 
-	-- 4. QUICK ACTIONS CARD
 	local CardWidth = (0.65 / 2)
 	local QuickCard = CreateBeautifulCard(parentFrame, UDim2.new(CardWidth, -(PADDING * 2.5), 0.6, -(PADDING * 3)), UDim2.new(0.35, PADDING * 2, 0.4, PADDING * 2))
 	
@@ -363,8 +342,9 @@ local function BuildHomeDashboard(parentFrame)
 		if player.Character and player.Character:FindFirstChild("Humanoid") then player.Character.Humanoid.Health = 0 end
 	end)
 
-	-- REJOIN SERVER BUTTON (WARNUNGSFREI & MIT AUTO-RELOAD)
 	CreateActionButton("Rejoin Server", 150, function()
+		cleanupOldGui()
+		
 		local hasQueue, queueFunc = pcall(function()
 			return queue_on_teleport or (getgenv and getgenv().queue_on_teleport)
 		end)
@@ -385,7 +365,6 @@ local function BuildHomeDashboard(parentFrame)
 		end
 	end)
 
-	-- 5. ACTIVITY LOG CARD
 	local LogCard = CreateBeautifulCard(parentFrame, UDim2.new(CardWidth, -(PADDING * 2.5), 0.6, -(PADDING * 3)), UDim2.new(0.35 + CardWidth, PADDING * 1.5, 0.4, PADDING * 2))
 	
 	CreateLabel(LogCard, "📜 Activity Log", UDim2.new(0, 15, 0, 15), UDim2.new(1, 0, 0, 20), THEME.Font_Bold, THEME.TextColor, 16)
@@ -424,14 +403,10 @@ local function BuildHomeDashboard(parentFrame)
 	Players.PlayerRemoving:Connect(function(plr) AddLog(plr.Name .. " left", Color3.fromRGB(255, 120, 120)) end)
 end
 
---------------------------------------------------------------------------
--- SCRIPTS TAB & SUCHFUNKTION BAUEN
---------------------------------------------------------------------------
 local function BuildScriptsTab(parentFrame)
 	parentFrame.BackgroundTransparency = 1
 	local PADDING = 15
 
-	-- Suchleiste Frame oben
 	local SearchBarFrame = Instance.new("Frame")
 	SearchBarFrame.Size = UDim2.new(1, -(PADDING * 2), 0, 50)
 	SearchBarFrame.Position = UDim2.new(0, PADDING, 0, PADDING)
@@ -457,7 +432,6 @@ local function BuildScriptsTab(parentFrame)
 	SearchBox.TextSize = 16
 	SearchBox.Parent = SearchBarFrame
 
-	-- Grid Container für die Suchergebnisse
 	local ResultsScroll = Instance.new("ScrollingFrame")
 	ResultsScroll.Size = UDim2.new(1, -(PADDING * 2), 1, -80)
 	ResultsScroll.Position = UDim2.new(0, PADDING, 0, 75)
@@ -491,21 +465,17 @@ local function BuildScriptsTab(parentFrame)
 				for _, scriptData in ipairs(result.result.scripts) do
 					local Card = CreateBeautifulCard(ResultsScroll, UDim2.new(1, 0, 1, 0), UDim2.new(0, 0, 0, 0))
 
-					-- Titel
 					local titleText = scriptData.title or "Unbenanntes Script"
 					local titleLabel = CreateLabel(Card, titleText, UDim2.new(0, 12, 0, 12), UDim2.new(1, -90, 0, 22), THEME.Font_Bold, THEME.TextColor, 13)
 					titleLabel.TextTruncate = Enum.TextTruncate.AtEnd
 
-					-- Game / Kategorie
 					local gameName = scriptData.game and scriptData.game.name or "Universal Script"
 					local gameLabel = CreateLabel(Card, gameName, UDim2.new(0, 12, 0, 34), UDim2.new(1, -24, 0, 20), THEME.Font_Reg, THEME.TextColor_Dim, 12)
 					gameLabel.TextTruncate = Enum.TextTruncate.AtEnd
 
-					-- Views
 					local views = scriptData.views or 0
 					CreateLabel(Card, views .. " Views", UDim2.new(0, 12, 1, -55), UDim2.new(0.6, 0, 0, 20), THEME.Font_Reg, THEME.TextColor_Dim, 11)
 
-					-- Verified Badge
 					local Badge = Instance.new("Frame")
 					Badge.Size = UDim2.new(0, 70, 0, 22)
 					Badge.Position = UDim2.new(1, -80, 0, 12)
@@ -515,7 +485,6 @@ local function BuildScriptsTab(parentFrame)
 					local bText = CreateLabel(Badge, "VERIFIED", UDim2.new(0,0,0,0), UDim2.new(1,0,1,0), THEME.Font_Bold, Color3.fromRGB(255,255,255), 10)
 					bText.TextXAlignment = Enum.TextXAlignment.Center
 
-					-- Action Buttons (Ausführen & Kopieren)
 					local ExecBtn = Instance.new("TextButton")
 					ExecBtn.Size = UDim2.new(0.48, 0, 0, 28)
 					ExecBtn.Position = UDim2.new(0, 12, 1, -34)
@@ -570,9 +539,6 @@ local function BuildScriptsTab(parentFrame)
 	end)
 end
 
---------------------------------------------------------------------------
--- ECHTER LADEVORGANG
---------------------------------------------------------------------------
 task.spawn(function()
 	UpdateLoading("Erstelle Hauptfenster...", 20)
 	
@@ -704,9 +670,6 @@ task.spawn(function()
 	
 	UpdateLoading("Ladevorgang abgeschlossen!", 100)
 
-	--------------------------------------------------------------------------
-	-- LOGIK FÜR SLIDE ANIMATION BINDEN
-	--------------------------------------------------------------------------
 	local function ToggleUI()
 		if not isLoaded or isAnimating then return end 
 		isAnimating = true
@@ -730,9 +693,6 @@ task.spawn(function()
 		if not gameProcessed and input.KeyCode == TOGGLE_KEY then ToggleUI() end
 	end)
 
-	--------------------------------------------------------------------------
-	-- LADE-UI AUSBLENDEN
-	--------------------------------------------------------------------------
 	local fadeOutInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 	TweenService:Create(LoadingTitle, fadeOutInfo, {TextTransparency = 1}):Play()
 	TweenService:Create(LoadingPercent, fadeOutInfo, {TextTransparency = 1}):Play()
